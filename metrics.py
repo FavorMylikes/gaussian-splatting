@@ -19,7 +19,7 @@ import json
 from tqdm import tqdm
 from utils.image_utils import psnr
 from argparse import ArgumentParser
-import lpips
+import lpips as lpips_package
 
 def readImages(renders_dir, gt_dir):
     renders = []
@@ -95,6 +95,7 @@ def evaluate(model_paths, eval_dir):
 if __name__ == "__main__":
     device = torch.device("cuda:0")
     torch.cuda.set_device(device)
+    lpips = lpips_package.LPIPS(net='vgg').to(device)
 
     # Set up command line argument parser
     parser = ArgumentParser(description="Training script parameters")
