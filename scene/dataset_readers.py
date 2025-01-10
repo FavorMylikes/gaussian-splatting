@@ -398,7 +398,8 @@ def readLerfInfo(path, white_background, eval, extension=".png"):
                            train_cameras=train_cam_infos,
                            test_cameras=test_cam_infos,
                            nerf_normalization=nerf_normalization,
-                           ply_path=ply_path)
+                           ply_path=ply_path,
+                           is_nerf_synthetic=False)
     return scene_info
 
 sceneLoadTypeCallbacks = {
