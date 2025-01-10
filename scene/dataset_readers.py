@@ -359,7 +359,8 @@ def readCamerasFromLerfTransforms(path, transformsfile, white_background, extens
             FovX = fovx
 
             cam_infos.append(CameraInfo(uid=idx, R=R, T=T, FovY=FovY, FovX=FovX, image=image,
-                            image_path=image_path, image_name=image_name, width=image.size[0], height=image.size[1]))
+                            image_path=image_path, image_name=image_name, width=image.size[0], height=image.size[1], 
+                                        depth_path="", depth_params=None, is_test=False))
             
     return cam_infos
 
