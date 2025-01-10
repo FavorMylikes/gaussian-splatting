@@ -30,6 +30,7 @@ class CameraInfo(NamedTuple):
     FovY: np.array
     FovX: np.array
     depth_params: dict
+    image: np.array
     image_path: str
     image_name: str
     depth_path: str
