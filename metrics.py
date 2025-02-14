@@ -22,16 +22,13 @@ from argparse import ArgumentParser
 import lpips as lpips_package
 
 def readImages(renders_dir, gt_dir):
-    renders = []
-    gts = []
-    image_names = []
     for fname in os.listdir(renders_dir):
         render = Image.open(renders_dir / fname)
         gt = Image.open(gt_dir / fname)
-        renders.append(tf.to_tensor(render).unsqueeze(0)[:, :3, :, :].cuda())
-        gts.append(tf.to_tensor(gt).unsqueeze(0)[:, :3, :, :].cuda())
-        image_names.append(fname)
-    return renders, gts, image_names
+
+        yield tf.to_tensor(render).unsqueeze(0)[:, :3, :, :].cuda(), \
+              tf.to_tensor(gt).unsqueeze(0)[:, :3, :, :].cuda(), \
+              fname
 
 def evaluate(model_paths, eval_dir):
 
@@ -62,16 +59,19 @@ def evaluate(model_paths, eval_dir):
                 method_dir = test_dir / method
                 gt_dir = method_dir/ "gt"
                 renders_dir = method_dir / "renders"
-                renders, gts, image_names = readImages(renders_dir, gt_dir)
+                image_names = list(os.listdir(renders_dir))
+                total = len(image_names)
+                # renders, gts, image_names = readImages(renders_dir, gt_dir)
 
                 ssims = []
                 psnrs = []
                 lpipss = []
 
-                for idx in tqdm(range(len(renders)), desc="Metric evaluation progress"):
-                    ssims.append(ssim(renders[idx], gts[idx]))
-                    psnrs.append(psnr(renders[idx], gts[idx]))
-                    lpipss.append(lpips(renders[idx], gts[idx]).detach())
+                for render, gt, frame in tqdm(readImages(renders_dir, gt_dir), \
+                                              desc="Metric evaluation progress", total=total):
+                    ssims.append(ssim(render, gt))
+                    psnrs.append(psnr(render, gt))
+                    lpipss.append(lpips(render, gt).detach())
 
                 print("  SSIM : {:>12.7f}".format(torch.tensor(ssims).mean(), ".5"))
                 print("  PSNR : {:>12.7f}".format(torch.tensor(psnrs).mean(), ".5"))
